@@ -22,11 +22,15 @@ vim.pack.add({
 	"https://github.com/olivercederborg/poimandres.nvim",
 	"https://github.com/mfussenegger/nvim-jdtls",
 	"https://github.com/echasnovski/mini.icons",
+	"https://github.com/goolord/alpha-nvim",
 	{ src = "https://github.com/catppuccin/nvim", name = "catppuccin" },
 	{ src = "https://github.com/olimorris/onedarkpro.nvim", name = "onedarkpro" },
 	{ src = "https://github.com/nvim-treesitter/nvim-treesitter", version = "main" },
 	{ src = "https://github.com/saghen/blink.cmp", version = vim.version.range("^1.x") },
 })
+
+-- start up screen with alpha nvim
+require("alpha-config")
 
 -- default color scheme
 vim.cmd("colorscheme onedark")
@@ -314,7 +318,28 @@ require("mini.icons").setup()
 -- config: mini.statusline
 require("mini.statusline").setup({
 	use_icons = true,
+	content = {
+		active = function()
+			local mode, mode_hl = MiniStatusline.section_mode({ trunc_width = 120 })
+			local git = MiniStatusline.section_git({ trunc_width = 75 })
+			local diagnostics = MiniStatusline.section_diagnostics({ trunc_width = 75 })
+			local filename = MiniStatusline.section_filename({ trunc_width = 140 })
+			local fileinfo = MiniStatusline.section_fileinfo({ trunc_width = 120 })
+			local location = MiniStatusline.section_location({ trunc_width = 75 })
+
+			return MiniStatusline.combine_groups({
+				{ hl = mode_hl, strings = { mode:upper() } },
+				{ hl = "MiniStatuslineDevinfo", strings = { git, diagnostics } },
+				"%<",
+				{ hl = "MiniStatuslineFilename", strings = { filename } },
+				"%=",
+				{ hl = "MiniStatuslineFileinfo", strings = { fileinfo } },
+				{ hl = mode_hl, strings = { location } },
+			})
+		end,
+	},
 })
+
 -- config: bufferline
 require("bufferline").setup({
 	options = {
